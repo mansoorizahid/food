@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/material-components-web/14.0.0/material-components-web.min.css">
+    <link href="https://cdn.datatables.net/2.0.1/css/dataTables.material.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <style>
+        body {
+            /* Set grey background */
+            background-color: #FAF3F0; /* You can adjust the shade of grey as needed */
+        }
+
+        /* Custom styles for cards */
+        .card {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 5px;
+            margin-bottom: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        #foodTable_wrapper {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 5px;
+            margin-bottom: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        /* Custom styles for cards */
+        .cardin {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: white;
+            height: 500px;
+        }
+        
+        /* CSS */
+        #doughnutChart {
+            width: auto; /* Set maximum width */
+            margin: 0 auto; /* Center the chart horizontally */
+            margin-top: 0;
+            height: 300px; /* Allow height to adjust based on content */
+        }
+
+        #averageChart {
+            width: auto; /* Set maximum width */
+            margin: 0 auto; /* Center the chart horizontally */
+            margin-top: 0;
+            height: 300px; /* Allow height to adjust based on content */
+        }
+        #barChart {
+            width: auto; /* Set maximum width */
+            margin: 0 auto; /* Center the chart horizontally */
+            margin-top: 0;
+            height: 300px; /* Allow height to adjust based on content */
+        }
+        #insight {
+            width: auto; /* Set maximum width */
+            margin: 0 auto; /* Center the chart horizontally */
+            margin-top: 0;
+            height: 300px; /* Allow height to adjust based on content */
+        }
+        /* Reduce margin between rows */
+        .row {
+            margin-bottom: 2px; /* Adjust as needed */
+        }
+        /* Decrease h3 text size */
+        h3 {
+            font-size: 1.5rem;
+            text-align: center;
+        }
+        /* Responsive table */
+        #datatable-container {
+            height: 500px;
+        }
+        #map-container {
+            height: 500px;
+        }
+        /* Responsive table */
+        #map {
+            height: 450px;
+        }
+
+        #foodTable th,
+        #foodTable td {
+            padding: 5px;
+            text-align: center;
+            border: 1px solid #ddd;
+            white-space: nowrap; /* Prevent line breaks */
+        }
+
+        #foodTable th {
+            background-color: #f2f2f2;
+        }
+
+        #foodTable tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        #foodTable tbody tr:hover {
+            background-color: #f2f2f2;
+        }
+        .header {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .image-wrapper {
+            display: flex; /* Use flexbox to align the image and text */
+            align-items: center; /* Align items vertically */
+            margin: 0 20px; /* Adjust margin as needed */
+            padding-bottom: 5px;
+        }
+
+        .left-image img,
+        .right-image img {
+            width: 80px; /* Adjust the width as needed */
+            height: auto; /* Maintain aspect ratio */
+            animation-duration: 5s; /* Animation duration */
+            animation-timing-function: linear; /* Animation timing function */
+            animation-iteration-count: infinite; /* Animation iteration count */
+        }
+
+        .left-image img {
+            animation-name: rotateLeft; /* Apply rotateLeft animation to the left image */
+        }
+
+        .right-image img {
+            animation-name: rotateRight; /* Apply rotateRight animation to the right image */
+        }
+        .dt-length {
+            display: none;
+        }
+        #dt-length-0 {
+            display: none;
+        }
+        @keyframes rotateRight {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes rotateLeft {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(-360deg);
+            }
+        }
+        .insight-content {
+            text-align: justify;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        .insight-content ul {
+            list-style: none;
+            padding-left: 0;
+            margin-top: 50px;
+        }
+
+        .insight-content ul li {
+            margin-bottom: 10px;
+        }
+
+        .green-text {
+            color: green; /* Apply green color to text */
+            font-weight: bold;
+        }
+
+        .red-text {
+            color: red; /* Apply red color to text */
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="header">
+            <div class="image-wrapper left-image">
+                <img src="/dish.png" alt="Dish">
+            </div>
+            <h1 class="mt-1 mb-3 text-center">Northampton Food Hygiene</h1>
+            <div class="image-wrapper right-image">
+                <img src="/pizza.png" alt="Pizza">
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card">
+                    <h3>Average Rating</h3>
+                    <div class="charts">
+                        <div id="averageChart"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <h3>Reviews</h3>
+                    <div class="charts">
+                        <div id="doughnutChart"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <h3>Types Distribution</h3>
+                    <div class="charts">
+                        <div id="barChart"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <h3>Reviews Distribution</h3>
+                    <div class="charts">
+                        <div id="insight"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4" id="map-container">
+                <div class="insights mt-0">
+                    <div class="cardin">
+                        <h3>Map</h3>
+                        <div class="charts">
+                            <div id="map"></div>
+                        </div>
+                    </div>
+                    <!-- Place your insights content here -->
+                </div>
+            </div>
+            <div class="col-md-4" id="map-container">
+                <div class="insight mt-0">
+                    <div class="cardin">
+                        <h3>Insights</h3>
+                            <div id="insight" class="insight-content">
+                                <ul>
+                                    <li>
+                                        <strong>1. High Standards:</strong> Northampton boasts a <span class="green-text">4.4</span> average hygiene rating, with over half (<span class="green-text">56%</span>) receiving 4 or 5 stars.
+                                    </li>
+                                    <li>
+                                        <strong>2. Restaurant Edge:</strong> Restaurants lead in hygiene, while takeaways have the lowest <span class="green-text">5-star</span> ratings and most <span class="red-text">1 & 2</span> star ratings.
+                                    </li>
+                                    <li>
+                                        <strong>3. Central Concerns:</strong> Lower-rated establishments cluster in central postcodes (<span class="red-text">NN1</span> & <span class="red-text">NN2</span>), potentially reflecting takeaway prioritization of speed over hygiene.
+                                    </li>
+                                    <li>
+                                        <strong>4. Takeaway Breakdown:</strong> Lower hygiene ratings in takeaways suggest potential areas for improvement within this sector.
+                                    </li>
+                                    <li>
+                                        <strong>5. Data Depth:</strong> Further exploration beyond basic ratings (e.g., hygiene inspection reports) will provide richer insights.
+                                    </li>
+                                </ul>
+                            </div>
+                    </div>
+                    <!-- Place your insights content here -->
+                </div>
+            </div>            
+            <div class="col-md-4">
+                <div class="data-table mt-0" id="datatable-container">
+                    <table id="foodTable" class="stripe hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Types</th>
+                                <th>Postcode</th>
+                                <th>Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be dynamically populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://cdn.datatables.net/2.0.1/js/dataTables.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/2.0.1/js/dataTables.bootstrap5.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Fetch data from server and populate DataTable
+            fetch('/food')
+                .then(response => response.json())
+                .then(data => {
+                    $('#foodTable').DataTable({
+                        data: data,
+                        columns: [
+                            { data: 'NAME' },
+                            { data: 'TYPES' },
+                            { data: 'POSTCODE' },
+                            { data: 'SCORE' }
+                        ]
+                    });
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        
+           // Google Charts - fetch data and draw
+            google.charts.load('current', {packages:['corechart', 'bar', 'map']});
+            google.charts.setOnLoadCallback(() => {
+                drawCharts();
+            });
+
+            // Define the single drawChart function with data and options as parameters
+            function drawChart(chartId, data, options) {
+                var chart = new google.visualization[options.chartType](document.getElementById(chartId));
+                chart.draw(data, options);
+            }
+            
+            // Define the drawCharts function
+            function drawCharts() {
+                // Bar Chart - Types Distribution
+                var barData = google.visualization.arrayToDataTable([
+                    ['Type', 'Count', { role: 'style' }, { role: 'annotation' }],
+                    ['Restaurant', 622, '#FFC0CB', '622'],  // Light pink
+                    ['Bar', 274, '#E6E6FA', '274'],         // Light purple
+                    ['Takeaway', 254, '#ADD8E6', '254']      // Light blue
+                ]);
+    
+                var barOptions = {
+                    bar: { groupWidth: '50%' },
+                    legend: 'none',
+                    vAxis: {
+                        gridlines: { color: 'transparent' }, // Remove y-axis gridlines
+                        viewWindow: { max: 630 } // Set the maximum view window to 630
+                    },
+                    annotations: {
+                        textStyle: {
+                            fontSize: 12,
+                            bold: true,
+                            color: '#333' // Set text color for annotations
+                        }
+                    },
+                    chartType: 'ColumnChart' // Specify chart type
+                };
+    
+                drawChart('barChart', barData, barOptions);
+
+                // Doughnut Chart for Ratings
+                var doughnutData = google.visualization.arrayToDataTable([
+                    ['Rating', 'Count'],
+                    ['1 Star', 12],
+                    ['2 Star', 23],
+                    ['3 Star', 170],
+                    ['4 Star', 201],
+                    ['5 Star', 744]
+                ]);
+                var doughnutOptions = {
+                    pieHole: 0.5,
+                    pieSliceTextStyle: {
+                        color: 'white'
+                    },
+                    legend: { position: 'top', maxLines: 2 },
+                    pieSliceText: 'percentage',
+                    colors: ['#D10000', '#FF2E2E', '#FFA500', '#00A300', '#00D100'], // Set custom colors
+                    chartType: 'PieChart'
+                };
+
+                drawChart('doughnutChart', doughnutData, doughnutOptions);
+                // Doughnut Chart - Average Ratings
+                var averageData = google.visualization.arrayToDataTable([
+                    ['Rating', 'Average'],
+                    ['', 4.4]
+                ]);
+                var averageOptions = {
+                    pieHole: 0.5,
+                    pieSliceTextStyle: {
+                        color: 'black',
+                        fontSize: 22// Adjust the font size as needed
+                    },
+                    legend: 'none',
+                    pieSliceText: 'value',
+                    colors: ['#800080'],
+                    chartType: 'PieChart' // Specify chart type
+                };
+    
+                drawChart('averageChart', averageData, averageOptions);
+    
+                // Stacked Bar Chart - Ratings Distribution
+                var stackedData = google.visualization.arrayToDataTable([
+                    ['Distribution', '1', '2', '3', '4', '5'],
+                    ['Restaurant', 4, 10, 67, 101, 440],
+                    ['Bar', 2, 3, 27, 50, 192],
+                    ['Takeaway', 6, 10, 76, 50, 112]
+                ]);
+    
+                var stackedOptions = {
+                    isStacked: true,
+                    legend: { position: 'top', maxLines: 2 },
+                    colors: [
+                        '#FF5733', '#FFA500', '#FFFF00', '#00D100', '#00A300' // Custom colors for each rating
+                    ],
+                    bar: { groupWidth: '75%' },
+                    hAxis: {
+                        viewWindow: { max: 600 }, // Set maximum x-axis value
+                        gridlines: { color: 'transparent' } // Remove gridlines
+                    },
+                    chartType: 'BarChart' // Specify chart type
+                };
+    
+                drawChart('insight', stackedData, stackedOptions);
+            }
+    
+            // Leaflet Map
+            var map = L.map('map').setView([52.237, -0.9], 11); // Centered on a rough average location
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+    
+            // Fetch data from API
+            fetch('/map')
+                .then(response => response.json())
+                .then(data => {
+                    // Iterate over each data point and create markers with tooltips
+                    data.forEach(item => {
+                        // Extract latitude, longitude, name, and score from the data
+                        const lat = parseFloat(item.LATITUDE);
+                        const lon = parseFloat(item.LONGITUDE);
+                        const name = item.NAME;
+                        const score = parseInt(item.SCORE);
+    
+                        // Determine color based on the score
+                        let color;
+                        if (score >= 4) {
+                            color = 'green';
+                        } else if (score === 3) {
+                            color = 'orange';
+                        } else {
+                            color = 'red';
+                        }
+    
+                        // Create circle marker with specified color and add to map
+                        const marker = L.circleMarker([lat, lon], {
+                            radius: 8, // Set the radius of the circle marker
+                            color: color, // Set the border color of the circle marker
+                            fillColor: color, // Set the fill color of the circle marker
+                            fillOpacity: 0.5 // Set the opacity of the fill color
+                        }).addTo(map);
+    
+                        // Create tooltip content with name and score
+                        const tooltipContent = `<b>Name:</b> ${name}<br><b>Score:</b> ${score}`;
+    
+                        // Bind tooltip to the marker
+                        marker.bindTooltip(tooltipContent);
+                    });
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        });
+    
+    </script>
+</body>
+</html>
