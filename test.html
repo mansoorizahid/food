@@ -76,6 +76,7 @@
         /* Responsive table */
         #datatable-container {
             height: 500px;
+            background-color: white;
         }
         #map-container {
             height: 500px;
@@ -84,13 +85,20 @@
         #map {
             height: 450px;
         }
+        #foodTable {
+            width: 100%;
+            max-width: 100%; /* Ensure the table doesn't exceed its container */
+            overflow-x: auto; /* Enable horizontal scrolling for small screens */
+            table-layout: fixed; /* Ensure the table width is fixed */
+        }
 
         #foodTable th,
         #foodTable td {
             padding: 5px;
             text-align: center;
             border: 1px solid #ddd;
-            white-space: nowrap; /* Prevent line breaks */
+            /* Remove white-space: nowrap; property */
+            font-size: 14px; /* Set a default font size */
         }
 
         #foodTable th {
@@ -104,6 +112,15 @@
         #foodTable tbody tr:hover {
             background-color: #f2f2f2;
         }
+
+        /* Media query for smaller screens */
+        @media screen and (max-width: 768px) {
+            #foodTable th,
+            #foodTable td {
+                font-size: 12px; /* Adjust font size for smaller screens */
+            }
+        }
+
         .header {
             position: relative;
             display: flex;
@@ -120,7 +137,7 @@
 
         .left-image img,
         .right-image img {
-            width: 80px; /* Adjust the width as needed */
+            width: 100px; /* Adjust the width as needed */
             height: auto; /* Maintain aspect ratio */
             animation-duration: 5s; /* Animation duration */
             animation-timing-function: linear; /* Animation timing function */
